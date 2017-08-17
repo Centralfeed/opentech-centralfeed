@@ -178,6 +178,7 @@ order by ID ASC",ARRAY_A);
             where p.id in (".implode(',',$products).")
             order by ID ASC", OBJECT_K);
 
+        $wpdb->query('SET SQL_BIG_SELECTS=1;');
         $more_data =
          $wpdb->get_results("select p.id,
             pm2.meta_value as special_price,
