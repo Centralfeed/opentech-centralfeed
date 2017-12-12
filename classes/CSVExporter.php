@@ -186,6 +186,8 @@ order by ID ASC",ARRAY_A);
             pm3.meta_value as image_gallery,
             pm4.meta_value as variation_price,
             pm5.meta_value as variation_sale_price,
+            pm6.meta_value as special_from_date,
+            pm7.meta_value as special_to_date,
             p.post_type,
             p.post_content as description,
             p.post_excerpt as short_description
@@ -196,6 +198,8 @@ order by ID ASC",ARRAY_A);
             left join ".$wpdb->prefix."postmeta pm3 on p.id=pm3.post_id and pm3.meta_key='_product_image_gallery'
             left join ".$wpdb->prefix."postmeta pm4 on p.id=pm4.post_id and pm4.meta_key='_min_variation_regular_price'
             left join ".$wpdb->prefix."postmeta pm5 on p.id=pm5.post_id and pm5.meta_key='_min_variation_sale_price'
+            left join ".$wpdb->prefix."postmeta pm6 on p.id=pm6.post_id and pm6.meta_key='_sale_price_dates_from'
+            left join ".$wpdb->prefix."postmeta pm7 on p.id=pm7.post_id and pm7.meta_key='_sale_price_dates_to'
             where p.id in (".implode(',',$products).")
             order by ID ASC", OBJECT_K);
 
@@ -240,6 +244,20 @@ order by ID ASC",ARRAY_A);
                     $p->options->special_price = $more_data[$p_id]->variation_sale_price;
                 }
             }
+
+	        if (!empty($more_data[$p_id]->special_from_date) &&!is_null($more_data[$p_id]->special_from_date)){
+		        $date = date_create();
+		        date_timestamp_set($date, $more_data[$p_id]->special_from_date);
+
+		        $p->options->special_from_date =  date_format($date, 'Y-m-d') . ' 00:00:00';
+	        }
+
+	        if (!empty($more_data[$p_id]->special_to_date) &&!is_null($more_data[$p_id]->special_to_date)){
+		        $date = date_create();
+		        date_timestamp_set($date, $more_data[$p_id]->special_to_date);
+
+		        $p->options->special_to_date = date_format($date, 'Y-m-d') . ' 00:00:00';
+	        }
 
             $p->primary_image_url = $images[$more_data[$p_id]->primary_image]->guid;
             if (is_null($p->primary_image_url) && $is_variation){
